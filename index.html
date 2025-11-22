@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Todo List</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .app-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title h2 {
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        button i {
+            font-size: 1.1rem;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #e11574;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #3ab3d8;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background-color: #e68a1a;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .flex-row > * {
+            flex: 1;
+        }
+
+        .task-type-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            transition: var(--transition);
+        }
+
+        .task-type-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .type-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .type-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .type-name {
+            font-weight: 600;
+        }
+
+        .task-list {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .task-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--primary);
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .task-type {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        .task-description {
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+
+        .task-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .date-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .date-group i {
+            color: var(--primary);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-actions button {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: var(--border-radius);
+            margin-left: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .color-input-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls select, .filter-controls button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .period-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .view-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .view-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .view-option.active {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .date-section {
+            margin-bottom: 25px;
+        }
+
+        .date-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .date-tasks {
+            background-color: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Advanced Todo List</h1>
+            <p class="app-description">Organize your tasks with custom types, dates, and time periods</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column: Task Types and Task Form -->
+            <div class="left-column">
+                <!-- Task Types Management -->
+                <div class="card">
+                    <div class="card-title">
+                        <h2><i class="fas fa-tags"></i> Task Types</h2>
+                    </div>
+                    <div class="form-group">
+                        <label for="type-name">Type Name</label>
+                        <div class="color-input-container">
+                            <input type="text" id="type-name" placeholder="Enter type name">
+                            <input type="color" id="type-color" value="#4361ee">
+                            <div class="color-preview" id="color-preview" style="background-color: #4361ee"></div>
+                        </div>
+                    </div>
+                    <button id="add-type-btn" class="btn-success">
+                        <i class="fas fa-plus"></i> Add Type
+                    </button>
+                    
+                    <div id="types-list" class="types-list">
+                        <!-- Task types will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Add Task Form -->
+                <div class="card">
+                    <div class="card-title">
+                        <h2><i class="fas fa-plus-circle"></i> Add New Task</h2>
+                    </div>
+                    <form id="task-form">
+                        <div class="form-group">
+                            <label for="task-title">Task Title</label>
+                            <input type="text" id="task-title" required placeholder="What needs to be done?">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task-description">Description</label>
+                            <textarea id="task-description" rows="3" placeholder="Add details about your task..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="task-type">Task Type</label>
+                            <select id="task-type" required>
+                                <!-- Options will be populated from task types -->
+                            </select>
+                        </div>
+                        
+                        <div class="flex-row">
+                            <div class="form-group">
+                                <label for="task-date">Date</label>
+                                <input type="date" id="task-date">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="task-time">Time</label>
+                                <input type="time" id="task-time">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="has-period"> Set Time Period
+                            </label>
+                        </div>
+                        
+                        <div id="period-inputs" class="period-inputs hidden">
+                            <div class="form-group">
+                                <label for="start-date">Start Date</label>
+                                <input type="date" id="start-date">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="end-date">End Date</label>
+                                <input type="date" id="end-date">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-success">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Statistics -->
+                <div class="card">
+                    <div class="card-title">
+                        <h2><i class="fas fa-chart-pie"></i> Statistics</h2>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-tasks">0</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completed-tasks">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="pending-tasks">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Task List and Filters -->
+            <div class="right-column">
+                <!-- View Options -->
+                <div class="view-options">
+                    <div class="view-option active" data-view="list">
+                        <i class="fas fa-list"></i> List View
+                    </div>
+                    <div class="view-option" data-view="date">
+                        <i class="fas fa-calendar-alt"></i> Date View
+                    </div>
+                    <div class="view-option" data-view="type">
+                        <i class="fas fa-tag"></i> Type View
+                    </div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="card">
+                    <div class="card-title">
+                        <h2><i class="fas fa-filter"></i> Tasks</h2>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="filter-type">
+                            <option value="all">All Types</option>
+                            <!-- Options will be populated from task types -->
+                        </select>
+                        <select id="filter-status">
+                            <option value="all">All Tasks</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <button id="clear-completed" class="btn-warning">
+                            <i class="fas fa-trash"></i> Clear Completed
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Task List View -->
+                <div id="list-view" class="view">
+                    <div class="card">
+                        <div id="task-list" class="task-list">
+                            <!-- Tasks will be listed here -->
+                        </div>
+                        <div id="empty-state" class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p>No tasks yet. Add a task to get started!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date View -->
+                <div id="date-view" class="view hidden">
+                    <div class="card">
+                        <div id="date-task-list" class="task-list">
+                            <!-- Tasks grouped by date will be listed here -->
+                        </div>
+                        <div id="date-empty-state" class="empty-state hidden">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No tasks with dates yet. Add a task with a date to see them here!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type View -->
+                <div id="type-view" class="view hidden">
+                    <div class="card">
+                        <div id="type-task-list" class="task-list">
+                            <!-- Tasks grouped by type will be listed here -->
+                        </div>
+                        <div id="type-empty-state" class="empty-state hidden">
+                            <i class="fas fa-tags"></i>
+                            <p>No tasks with types yet. Add a task with a type to see them here!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i> Task added successfully!
+    </div>
+
+    <script>
+        // Data models
+        let taskTypes = [];
+        let tasks = [];
+
+        // DOM elements
+        const typeNameInput = document.getElementById('type-name');
+        const typeColorInput = document.getElementById('type-color');
+        const colorPreview = document.getElementById('color-preview');
+        const addTypeBtn = document.getElementById('add-type-btn');
+        const typesList = document.getElementById('types-list');
+        const taskTypeSelect = document.getElementById('task-type');
+        const filterTypeSelect = document.getElementById('filter-type');
+        const taskForm = document.getElementById('task-form');
+        const taskList = document.getElementById('task-list');
+        const dateTaskList = document.getElementById('date-task-list');
+        const typeTaskList = document.getElementById('type-task-list');
+        const emptyState = document.getElementById('empty-state');
+        const dateEmptyState = document.getElementById('date-empty-state');
+        const typeEmptyState = document.getElementById('type-empty-state');
+        const hasPeriodCheckbox = document.getElementById('has-period');
+        const periodInputs = document.getElementById('period-inputs');
+        const filterStatusSelect = document.getElementById('filter-status');
+        const clearCompletedBtn = document.getElementById('clear-completed');
+        const viewOptions = document.querySelectorAll('.view-option');
+        const views = document.querySelectorAll('.view');
+        const notification = document.getElementById('notification');
+        const totalTasksEl = document.getElementById('total-tasks');
+        const completedTasksEl = document.getElementById('completed-tasks');
+        const pendingTasksEl = document.getElementById('pending-tasks');
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateUI();
+            setupEventListeners();
+            showNotification('Welcome to your Advanced Todo List!', 'success');
+        });
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Task type color preview
+            typeColorInput.addEventListener('input', function() {
+                colorPreview.style.backgroundColor = this.value;
+            });
+
+            // Add task type
+            addTypeBtn.addEventListener('click', addTaskType);
+
+            // Toggle period inputs
+            hasPeriodCheckbox.addEventListener('change', function() {
+                periodInputs.classList.toggle('hidden', !this.checked);
+            });
+
+            // Add task
+            taskForm.addEventListener('submit', addTask);
+
+            // Filter tasks
+            filterTypeSelect.addEventListener('change', updateUI);
+            filterStatusSelect.addEventListener('change', updateUI);
+
+            // Clear completed tasks
+            clearCompletedBtn.addEventListener('click', clearCompletedTasks);
+
+            // View options
+            viewOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const view = this.getAttribute('data-view');
+                    switchView(view);
+                });
+            });
+
+            // Set today's date as default for task date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('task-date').value = today;
+        }
+
+        // Switch between different views
+        function switchView(view) {
+            // Update active view option
+            viewOptions.forEach(option => {
+                if (option.getAttribute('data-view') === view) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+
+            // Show selected view, hide others
+            views.forEach(v => {
+                if (v.id === `${view}-view`) {
+                    v.classList.remove('hidden');
+                } else {
+                    v.classList.add('hidden');
+                }
+            });
+
+            // Update the specific view
+            if (view === 'date') {
+                updateDateView();
+            } else if (view === 'type') {
+                updateTypeView();
+            }
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            // Load task types
+            const storedTypes = localStorage.getItem('taskTypes');
+            if (storedTypes) {
+                taskTypes = JSON.parse(storedTypes);
+            } else {
+                // Create default task types if none exist
+                taskTypes = [
+                    { id: 1, name: 'Personal', color: '#4361ee' },
+                    { id: 2, name: 'Work', color: '#4cc9f0' },
+                    { id: 3, name: 'Shopping', color: '#f72585' },
+                    { id: 4, name: 'Health', color: '#4bb543' }
+                ];
+                saveTaskTypes();
+            }
+
+            // Load tasks
+            const storedTasks = localStorage.getItem('tasks');
+            if (storedTasks) {
+                tasks = JSON.parse(storedTasks);
+            }
+        }
+
+        // Save task types to localStorage
+        function saveTaskTypes() {
+            localStorage.setItem('taskTypes', JSON.stringify(taskTypes));
+        }
+
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Add a new task type
+        function addTaskType() {
+            const name = typeNameInput.value.trim();
+            const color = typeColorInput.value;
+
+            if (!name) {
+                showNotification('Please enter a type name', 'danger');
+                return;
+            }
+
+            // Check if type name already exists
+            if (taskTypes.some(type => type.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('A task type with this name already exists', 'danger');
+                return;
+            }
+
+            // Create new type
+            const newType = {
+                id: Date.now(), // Simple ID generation
+                name: name,
+                color: color
+            };
+
+            taskTypes.push(newType);
+            saveTaskTypes();
+            updateUI();
+            showNotification(`Task type "${name}" added successfully`, 'success');
+
+            // Reset form
+            typeNameInput.value = '';
+            typeColorInput.value = '#4361ee';
+            colorPreview.style.backgroundColor = '#4361ee';
+        }
+
+        // Delete a task type
+        function deleteTaskType(id) {
+            const typeToDelete = taskTypes.find(type => type.id === id);
+            
+            // Check if any tasks use this type
+            const tasksUsingType = tasks.filter(task => task.typeId === id);
+            
+            if (tasksUsingType.length > 0) {
+                if (!confirm(`This type is used by ${tasksUsingType.length} task(s). Deleting it will remove the type from these tasks. Continue?`)) {
+                    return;
+                }
+                
+                // Remove type from tasks
+                tasks.forEach(task => {
+                    if (task.typeId === id) {
+                        task.typeId = null;
+                    }
+                });
+                saveTasks();
+            }
+
+            // Remove the type
+            taskTypes = taskTypes.filter(type => type.id !== id);
+            saveTaskTypes();
+            updateUI();
+            showNotification(`Task type "${typeToDelete.name}" deleted`, 'warning');
+        }
+
+        // Add a new task
+        function addTask(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('task-title').value.trim();
+            const description = document.getElementById('task-description').value.trim();
+            const typeId = parseInt(document.getElementById('task-type').value);
+            const date = document.getElementById('task-date').value;
+            const time = document.getElementById('task-time').value;
+            const hasPeriod = document.getElementById('has-period').checked;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            if (!title) {
+                showNotification('Please enter a task title', 'danger');
+                return;
+            }
+
+            // Create new task
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                description: description,
+                typeId: typeId,
+                date: date || null,
+                time: time || null,
+                period: hasPeriod ? {
+                    startDate: startDate,
+                    endDate: endDate
+                } : null,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            updateUI();
+            showNotification(`Task "${title}" added successfully`, 'success');
+
+            // Reset form
+            taskForm.reset();
+            periodInputs.classList.add('hidden');
+            hasPeriodCheckbox.checked = false;
+            
+            // Set today's date as default for task date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('task-date').value = today;
+        }
+
+        // Toggle task completion status
+        function toggleTaskCompletion(id) {
+            const task = tasks.find(task => task.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                updateUI();
+                
+                const status = task.completed ? 'completed' : 'marked as pending';
+                showNotification(`Task "${task.title}" ${status}`, 'success');
+            }
+        }
+
+        // Delete a task
+        function deleteTask(id) {
+            const taskToDelete = tasks.find(task => task.id === id);
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(task => task.id !== id);
+                saveTasks();
+                updateUI();
+                showNotification(`Task "${taskToDelete.title}" deleted`, 'warning');
+            }
+        }
+
+        // Clear completed tasks
+        function clearCompletedTasks() {
+            const completedCount = tasks.filter(task => task.completed).length;
+            if (completedCount === 0) {
+                showNotification('No completed tasks to clear', 'info');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to clear ${completedCount} completed task(s)?`)) {
+                tasks = tasks.filter(task => !task.completed);
+                saveTasks();
+                updateUI();
+                showNotification(`${completedCount} completed task(s) cleared`, 'success');
+            }
+        }
+
+        // Update the UI with current data
+        function updateUI() {
+            updateTaskTypeSelects();
+            updateTypesList();
+            updateTaskList();
+            updateStats();
+            
+            // Update the current view if needed
+            const activeView = document.querySelector('.view-option.active').getAttribute('data-view');
+            if (activeView === 'date') {
+                updateDateView();
+            } else if (activeView === 'type') {
+                updateTypeView();
+            }
+        }
+
+        // Update task type selects (for task form and filter)
+        function updateTaskTypeSelects() {
+            // Clear existing options
+            taskTypeSelect.innerHTML = '';
+            filterTypeSelect.innerHTML = '<option value="all">All Types</option>';
+
+            // Add options for each task type
+            taskTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.id;
+                option.textContent = type.name;
+                taskTypeSelect.appendChild(option);
+
+                const filterOption = document.createElement('option');
+                filterOption.value = type.id;
+                filterOption.textContent = type.name;
+                filterTypeSelect.appendChild(filterOption);
+            });
+        }
+
+        // Update the task types list
+        function updateTypesList() {
+            typesList.innerHTML = '';
+
+            if (taskTypes.length === 0) {
+                typesList.innerHTML = '<div class="empty-state"><i class="fas fa-tags"></i><p>No task types yet. Add one to get started!</p></div>';
+                return;
+            }
+
+            taskTypes.forEach(type => {
+                const typeItem = document.createElement('div');
+                typeItem.className = 'task-type-item fade-in';
+                typeItem.innerHTML = `
+                    <div class="type-info">
+                        <div class="type-color" style="background-color: ${type.color}"></div>
+                        <span class="type-name">${type.name}</span>
+                    </div>
+                    <button class="btn-danger" data-id="${type.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                `;
+                typesList.appendChild(typeItem);
+            });
+
+            // Add event listeners to delete buttons
+            typesList.querySelectorAll('.btn-danger').forEach(button => {
+                button.addEventListener('click', function() {
+                    const typeId = parseInt(this.getAttribute('data-id'));
+                    deleteTaskType(typeId);
+                });
+            });
+        }
+
+        // Update the task list (list view)
+        function updateTaskList() {
+            taskList.innerHTML = '';
+            
+            // Get filter values
+            const typeFilter = filterTypeSelect.value;
+            const statusFilter = filterStatusSelect.value;
+            
+            // Filter tasks
+            let filteredTasks = [...tasks];
+            
+            // Fix: Properly handle type filtering
+            if (typeFilter !== 'all') {
+                const typeId = parseInt(typeFilter);
+                filteredTasks = filteredTasks.filter(task => task.typeId === typeId);
+            }
+            
+            if (statusFilter !== 'all') {
+                const isCompleted = statusFilter === 'completed';
+                filteredTasks = filteredTasks.filter(task => task.completed === isCompleted);
+            }
+            
+            // Show/hide empty state
+            if (filteredTasks.length === 0) {
+                emptyState.classList.remove('hidden');
+                taskList.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                taskList.classList.remove('hidden');
+                
+                // Sort tasks by date (if available) and creation time
+                filteredTasks.sort((a, b) => {
+                    // Put tasks with dates first
+                    if (a.date && !b.date) return -1;
+                    if (!a.date && b.date) return 1;
+                    
+                    // If both have dates, sort by date
+                    if (a.date && b.date) {
+                        const dateCompare = new Date(a.date) - new Date(b.date);
+                        if (dateCompare !== 0) return dateCompare;
+                    }
+                    
+                    // Finally sort by creation time (newest first)
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+                
+                // Add tasks to the list
+                filteredTasks.forEach(task => {
+                    const taskType = taskTypes.find(type => type.id === task.typeId);
+                    const taskItem = createTaskElement(task, taskType);
+                    taskList.appendChild(taskItem);
+                });
+            }
+        }
+
+        // Update the date view
+        function updateDateView() {
+            dateTaskList.innerHTML = '';
+            
+            // Get tasks with dates
+            const tasksWithDates = tasks.filter(task => task.date || (task.period && task.period.startDate));
+            
+            if (tasksWithDates.length === 0) {
+                dateEmptyState.classList.remove('hidden');
+                dateTaskList.classList.add('hidden');
+                return;
+            }
+            
+            dateEmptyState.classList.add('hidden');
+            dateTaskList.classList.remove('hidden');
+            
+            // Group tasks by date
+            const tasksByDate = {};
+            
+            tasksWithDates.forEach(task => {
+                let dateKey;
+                
+                if (task.period) {
+                    // For tasks with periods, use the start date for grouping
+                    dateKey = task.period.startDate;
+                } else {
+                    dateKey = task.date;
+                }
+                
+                if (!tasksByDate[dateKey]) {
+                    tasksByDate[dateKey] = [];
+                }
+                
+                tasksByDate[dateKey].push(task);
+            });
+            
+            // Sort dates chronologically
+            const sortedDates = Object.keys(tasksByDate).sort((a, b) => new Date(a) - new Date(b));
+            
+            // Create sections for each date
+            sortedDates.forEach(date => {
+                const dateSection = document.createElement('div');
+                dateSection.className = 'date-section fade-in';
+                
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'date-header';
+                
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                dateHeader.innerHTML = `
+                    <span>${formattedDate}</span>
+                    <span>${tasksByDate[date].length} task(s)</span>
+                `;
+                
+                const dateTasks = document.createElement('div');
+                dateTasks.className = 'date-tasks';
+                
+                // Add tasks for this date
+                tasksByDate[date].forEach(task => {
+                    const taskType = taskTypes.find(type => type.id === task.typeId);
+                    const taskItem = createTaskElement(task, taskType);
+                    dateTasks.appendChild(taskItem);
+                });
+                
+                dateSection.appendChild(dateHeader);
+                dateSection.appendChild(dateTasks);
+                dateTaskList.appendChild(dateSection);
+            });
+        }
+
+        // Update the type view
+        function updateTypeView() {
+            typeTaskList.innerHTML = '';
+            
+            // Group tasks by type
+            const tasksByType = {};
+            const noTypeTasks = [];
+            
+            tasks.forEach(task => {
+                if (task.typeId) {
+                    if (!tasksByType[task.typeId]) {
+                        tasksByType[task.typeId] = [];
+                    }
+                    tasksByType[task.typeId].push(task);
+                } else {
+                    noTypeTasks.push(task);
+                }
+            });
+            
+            if (Object.keys(tasksByType).length === 0 && noTypeTasks.length === 0) {
+                typeEmptyState.classList.remove('hidden');
+                typeTaskList.classList.add('hidden');
+                return;
+            }
+            
+            typeEmptyState.classList.add('hidden');
+            typeTaskList.classList.remove('hidden');
+            
+            // Create sections for each type
+            taskTypes.forEach(type => {
+                if (tasksByType[type.id]) {
+                    const typeSection = document.createElement('div');
+                    typeSection.className = 'date-section fade-in';
+                    
+                    const typeHeader = document.createElement('div');
+                    typeHeader.className = 'date-header';
+                    typeHeader.style.backgroundColor = type.color;
+                    
+                    typeHeader.innerHTML = `
+                        <span>${type.name} Tasks</span>
+                        <span>${tasksByType[type.id].length} task(s)</span>
+                    `;
+                    
+                    const typeTasks = document.createElement('div');
+                    typeTasks.className = 'date-tasks';
+                    
+                    // Add tasks for this type
+                    tasksByType[type.id].forEach(task => {
+                        const taskItem = createTaskElement(task, type);
+                        typeTasks.appendChild(taskItem);
+                    });
+                    
+                    typeSection.appendChild(typeHeader);
+                    typeSection.appendChild(typeTasks);
+                    typeTaskList.appendChild(typeSection);
+                }
+            });
+            
+            // Add tasks with no type
+            if (noTypeTasks.length > 0) {
+                const noTypeSection = document.createElement('div');
+                noTypeSection.className = 'date-section fade-in';
+                
+                const noTypeHeader = document.createElement('div');
+                noTypeHeader.className = 'date-header';
+                noTypeHeader.style.backgroundColor = '#6c757d';
+                
+                noTypeHeader.innerHTML = `
+                    <span>No Type</span>
+                    <span>${noTypeTasks.length} task(s)</span>
+                `;
+                
+                const noTypeTasksContainer = document.createElement('div');
+                noTypeTasksContainer.className = 'date-tasks';
+                
+                noTypeTasks.forEach(task => {
+                    const taskItem = createTaskElement(task, null);
+                    noTypeTasksContainer.appendChild(taskItem);
+                });
+                
+                noTypeSection.appendChild(noTypeHeader);
+                noTypeSection.appendChild(noTypeTasksContainer);
+                typeTaskList.appendChild(noTypeSection);
+            }
+        }
+
+        // Create a task element
+        function createTaskElement(task, taskType) {
+            const taskItem = document.createElement('div');
+            taskItem.className = `task-item ${task.completed ? 'completed' : ''} fade-in`;
+            taskItem.style.borderLeftColor = taskType ? taskType.color : '#ccc';
+            
+            let dateInfo = '';
+            if (task.period) {
+                dateInfo = `
+                    <div class="task-dates">
+                        <div class="date-group">
+                            <i class="fas fa-play-circle"></i>
+                            <span>Start: ${formatDate(task.period.startDate)}</span>
+                        </div>
+                        <div class="date-group">
+                            <i class="fas fa-flag-checkered"></i>
+                            <span>End: ${formatDate(task.period.endDate)}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (task.date) {
+                dateInfo = `
+                    <div class="task-dates">
+                        <div class="date-group">
+                            <i class="fas fa-calendar-day"></i>
+                            <span>Date: ${formatDate(task.date)}</span>
+                        </div>
+                        ${task.time ? `
+                            <div class="date-group">
+                                <i class="fas fa-clock"></i>
+                                <span>Time: ${task.time}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            taskItem.innerHTML = `
+                <div class="task-header">
+                    <div>
+                        <span class="task-title">${task.title}</span>
+                        ${taskType ? `<span class="task-type" style="background-color: ${taskType.color}">${taskType.name}</span>` : ''}
+                    </div>
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                </div>
+                ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                ${dateInfo}
+                <div class="task-actions">
+                    <button class="${task.completed ? 'btn-warning' : 'btn-success'}" data-id="${task.id}">
+                        <i class="fas ${task.completed ? 'fa-undo' : 'fa-check'}"></i>
+                        ${task.completed ? 'Mark Pending' : 'Mark Complete'}
+                    </button>
+                    <button class="btn-danger" data-id="${task.id}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            
+            // Add event listeners to task actions
+            const completeBtn = taskItem.querySelector('.btn-success, .btn-warning');
+            const deleteBtn = taskItem.querySelector('.btn-danger');
+            const checkbox = taskItem.querySelector('input[type="checkbox"]');
+            
+            completeBtn.addEventListener('click', function() {
+                const taskId = parseInt(this.getAttribute('data-id'));
+                toggleTaskCompletion(taskId);
+            });
+            
+            deleteBtn.addEventListener('click', function() {
+                const taskId = parseInt(this.getAttribute('data-id'));
+                deleteTask(taskId);
+            });
+            
+            checkbox.addEventListener('change', function() {
+                const taskId = parseInt(taskItem.querySelector('.task-actions button').getAttribute('data-id'));
+                toggleTaskCompletion(taskId);
+            });
+            
+            return taskItem;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(task => task.completed).length;
+            const pending = total - completed;
+            
+            totalTasksEl.textContent = total;
+            completedTasksEl.textContent = completed;
+            pendingTasksEl.textContent = pending;
+        }
+
+        // Helper function to format dates
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            notification.className = 'notification';
+            notification.classList.add(type === 'success' ? 'btn-success' : 'btn-danger');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
